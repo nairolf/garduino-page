@@ -19,7 +19,8 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator;
  *     itemOperations={"get", "delete"},
  *     shortName="sensors",
  *     attributes={
- *          "formats"={"json", "csv"={"text/csv"}}
+ *          "formats"={"json", "csv"={"text/csv"}},
+ *          "pagination_items_per_page"=20,
  *     },
  * )
  * @ApiFilter(SearchFilter::class, properties={"sensor": "partial"})
