@@ -2,13 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use App\Repository\SensorListingRepository;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "delete"},
+ *     shortName="sensors",
+ *     attributes={
+ *          "formats"={"json", "csv"={"text/csv"}}
+ *     },
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"sensor": "partial"})
+ * @ApiFilter(RangeFilter::class, properties={"value"})
+ * @ApiFilter(DateFilter::class, properties={"createdAt"})
  * @ORM\Entity(repositoryClass=SensorListingRepository::class)
  */
 class SensorListing
@@ -19,7 +35,7 @@ class SensorListing
      * @ORM\GeneratedValue(strategy="CUSTOM")
      * @ORM\CustomIdGenerator(class=UuidV4Generator::class)
      */
-    private ?string $id;
+    private string $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -31,7 +47,17 @@ class SensorListing
      */
     private ?float $value;
 
-    public function getId(): ?string
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private DateTime $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new DateTime();
+    }
+
+    public function getId(): string
     {
         return $this->id;
     }
@@ -58,5 +84,13 @@ class SensorListing
         $this->value = $value;
 
         return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
     }
 }
